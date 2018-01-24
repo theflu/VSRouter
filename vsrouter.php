@@ -1,25 +1,26 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Flu
  * Date: 10/10/2017
  * Time: 5:40 PM
  */
+
 class Router
 {
     public $routes = array();
+    public $case_sensitive = false;
 
-    public function get ($uri, $callback) {
-        $this->add('get', $uri, $callback);
+    public function get ($uri, $callback, $case_sensitive = NULL) {
+        $this->add('get', $uri, $callback, $case_sensitive);
     }
 
-    public function post ($uri, $callback) {
-        $this->add('post', $uri, $callback);
+    public function post ($uri, $callback, $case_sensitive = NULL) {
+        $this->add('post', $uri, $callback, $case_sensitive);
     }
 
-    public function postGet ($uri, $callback) {
-        $this->add('both', $uri, $callback);
+    public function postGet ($uri, $callback, $case_sensitive = NULL) {
+        $this->add('both', $uri, $callback, $case_sensitive);
     }
 
     public function set404 ($callback) {
@@ -47,16 +48,21 @@ class Router
         return array_values($uri_array);
     }
 
-    public function add ($type, $uri, $callback) {
+    public function add ($type, $uri, $callback, $case_sensitive) {
+        if (is_null($case_sensitive)) {
+            $case_sensitive = $this->case_sensitive;
+        }
+
         if (is_callable($callback)) {
             $uri_array = $this->uriExplode($uri);
 
             $uri_count = count($uri_array);
 
             $route = array(
-                'uri'      => $uri_array,
-                'uri_count'    => $uri_count,
-                'callback' => $callback
+                'uri'            => $uri_array,
+                'uri_count'      => $uri_count,
+                'callback'       => $callback,
+                'case_sensitive' => $case_sensitive
             );
 
             if ($type == 'both') {
@@ -97,7 +103,15 @@ class Router
             foreach ($this->routes[$http_method] as $route) {
                 if ($route['uri_count'] == $uri_count) {
                     foreach ($route['uri'] as $k => $u) {
-                        if ($uri_array[$k] != $u && (substr($u, 0, 1) != '{' && substr($u, -1) != '}')) {
+                        if ($route['case_sensitive']) {
+                            $request_param = $uri_array[$k];
+                            $route_param = $u;
+                        } else {
+                            $request_param = strtolower($uri_array[$k]);
+                            $route_param = strtolower($u);
+                        }
+
+                        if ($request_param != $route_param && (substr($u, 0, 1) != '{' && substr($u, -1) != '}')) {
                             $route_match = false;
                             $params = array();
                             break;
