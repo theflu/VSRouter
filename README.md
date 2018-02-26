@@ -9,17 +9,17 @@ routes.php
     
     // GET request to root of domain
     $router->get('/', function () {
-        echo 'Hello World I'am a GET request';
+        echo "Hello World I'am a GET request";
     });
     
     // POST request to root of domain
     $router->post('/', function () {
-        echo 'Hello World I'am a POST request';
+        echo "Hello World I'am a POST request";
     });
     
     // POST or GET request to /postGet
     $router->postGet('/postGet', function () {
-        echo 'Hello World I'am a POST/GET request';
+        echo "Hello World I'am a POST/GET request";
     });
     
     // 301 redirect '/oldPage' to '/newPage'
@@ -27,12 +27,12 @@ routes.php
     
     // Set 404 page
     $router->set404(function () {
-        echo 'Hello World 404 page not found';
+        echo "Hello World 404 page not found";
     });
     
     // URL variables
     $router->get('/user/{$username}', function ($username) {
-        echo 'Hello World I'am '.$username;
+        echo "Hello World I'am ".$username;
     });
     
     // Pass object to route
