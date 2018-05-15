@@ -4,6 +4,7 @@ Very Simple PHP Router
 ## Setup
 ### Define Routes
 routes.php
+
     <?php
     $router = new Router;
     
