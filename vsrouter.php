@@ -195,4 +195,9 @@ class Router
 
         return false;
     }
+
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
 }
