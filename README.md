@@ -6,7 +6,7 @@ Very Simple PHP Router
 routes.php
 
     <?php
-    $router = new Router;
+    global $router;
     
     // GET request to root of domain
     $router->get('/', function () {
@@ -48,8 +48,8 @@ routes.php
 index.php
 
     <?php
-    require 'vsrouter.php';
-    require 'routes.php';
+    $router = new Router();
+    $router->loadRoutes('/path/to/routes/directory');
     
     $router->route();
     ?>
