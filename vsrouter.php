@@ -2,7 +2,7 @@
 
 class Router
 {
-    public $routes = array();
+    private $routes = array();
 
     public function loadRoutes($routes)
     {
