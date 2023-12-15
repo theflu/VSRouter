@@ -1,5 +1,7 @@
 <?php
 
+namespace VSRouter;
+
 class Router
 {
     private $routes = array();
