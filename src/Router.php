@@ -9,15 +9,15 @@ class Router
     public function loadRoutes($routes)
     {
         if (is_dir($routes)) {
-            $di = new RecursiveDirectoryIterator($routes);
-            foreach (new RecursiveIteratorIterator($di) as $filename => $file) {
+            $di = new \RecursiveDirectoryIterator($routes);
+            foreach (new \RecursiveIteratorIterator($di) as $filename => $file) {
                 if ($file->isFile())
                     require $filename;
             }
         } elseif (is_file($routes)) {
             require $routes;
         } else {
-            throw new Exception('No routes found');
+            throw new \Exception('No routes found');
         }
     }
 
