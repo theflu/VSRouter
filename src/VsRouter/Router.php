@@ -1,6 +1,6 @@
 <?php
 
-namespace VSRouter;
+namespace VsRouter;
 
 class Router
 {
