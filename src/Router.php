@@ -39,8 +39,7 @@ class Router
     public function set404($callback)
     {
         if (is_callable($callback)) {
-            $this->routes['404'] = array();
-            $this->routes['404']['callback'] = $callback;
+            $this->routes['404'] = $callback;
         }
     }
 
@@ -48,7 +47,7 @@ class Router
     {
         http_response_code(404);
         if (isset($this->routes['404'])) {
-            call_user_func($this->routes['404']['callback']);
+            call_user_func($this->routes['404']);
         }
         exit();
     }
@@ -185,17 +184,9 @@ class Router
                     exit();
                 }
             }
-
-            if (!$route_match && isset($this->routes['404'])) {
-                http_response_code(404);
-                call_user_func($this->routes['404']['callback']);
-                exit();
-            }
-
-            return false;
         }
 
-        return false;
+        $this->get404();
     }
 
     public function getRoutes()
