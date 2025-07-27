@@ -8,6 +8,7 @@ class Router
      * @var array Holds all the registered routes, categorized by HTTP method.
      */
     private $routes = array();
+    private $restrict_request_methods = true;
 
     private const REQUEST_METHODS = array("GET","POST","PUT","DELETE");
 
@@ -139,13 +140,13 @@ class Router
      * @param callable|null $precheck The pre-check function.
      * @param callable|null $fail The failure function.
      */
-    public function add($request_types, $uris, $callback, $precheck = null, $fail = null)
+    public function add($request_methods, $uris, $callback, $precheck = null, $fail = null)
     {
         // Basic validation to ensure callbacks are actually callable.
         if (is_callable($callback) && (is_null($precheck) || is_callable($precheck)) && (is_null($fail) || is_callable($fail))) {
             // Allow for a single request type or an array of types
-            if (!is_array($request_types)) {
-                $request_types = [$request_types];
+            if (!is_array($request_methods)) {
+                $request_methods = [$request_methods];
             }
 
             // Allow for a single URI or an array of URIs.
@@ -167,13 +168,18 @@ class Router
                 );
 
                 // Add a route for each request type
-                foreach ($request_types as $request_type) {
+                foreach ($request_methods as $request_method) {
                     // Make the request type upper case
-                    $request_type = strtoupper($request_type);
+                    $request_method = strtoupper($request_method);
+
+                    // Check the request methods
+                    if($this->restrict_request_methods && !in_array($request_method, self::REQUEST_METHODS)){
+                        throw new \Exception('Invaild request method: '.$request_method);
+                    }
 
                     // Add the route
-                    if (!isset($this->routes[$request_type])) $this->routes[$request_type] = array();
-                    array_push($this->routes[$request_type], $route);
+                    if (!isset($this->routes[$request_method])) $this->routes[$request_method] = array();
+                    array_push($this->routes[$request_method], $route);
                 }
             }
         }
@@ -268,6 +274,13 @@ class Router
 
         // If we've gone through all routes and none have matched, it's a 404.
         $this->get404();
+    }
+
+    public function restrictRequestMethods($bool = true)
+    {
+        if (is_bool($bool)) {
+            $this->restrict_request_methods = $bool;
+        }
     }
 
     /**
