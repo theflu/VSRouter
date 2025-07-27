@@ -169,7 +169,7 @@ class Router
                 // Add a route for each request type
                 foreach ($request_types as $request_type) {
                     // Make the request type upper case
-                    $request_type = strtolower($request_type);
+                    $request_type = strtoupper($request_type);
 
                     // Add the route
                     if (!isset($this->routes[$request_type])) $this->routes[$request_type] = array();
