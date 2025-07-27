@@ -59,7 +59,7 @@ class Router
      */
     public function postGet($uri, $callback, $precheck = null, $fail = null)
     {
-        $this->add('both', $uri, $callback, $precheck, $fail);
+        $this->add(['post', 'get'], $uri, $callback, $precheck, $fail);
     }
 
     /**
@@ -137,10 +137,15 @@ class Router
      * @param callable|null $precheck The pre-check function.
      * @param callable|null $fail The failure function.
      */
-    public function add($type, $uris, $callback, $precheck = null, $fail = null)
+    public function add($request_types, $uris, $callback, $precheck = null, $fail = null)
     {
         // Basic validation to ensure callbacks are actually callable.
         if (is_callable($callback) && (is_null($precheck) || is_callable($precheck)) && (is_null($fail) || is_callable($fail))) {
+            // Allow for a single request type or an array of types
+            if (!is_array($request_types)) {
+                $request_types = [$request_types];
+            }
+
             // Allow for a single URI or an array of URIs.
             if (!is_array($uris)) {
                 $uris = [$uris];
@@ -150,6 +155,7 @@ class Router
                 $uri_array = $this->uriExplode($uri);
                 $uri_count = count($uri_array);
 
+                // Build the route array
                 $route = array(
                     'uri' => $uri_array,
                     'uri_count' => $uri_count,
@@ -158,24 +164,10 @@ class Router
                     'fail' => $fail
                 );
 
-                if ($type == 'both') {
-                    // Add the route for both GET and POST.
-                    if (!isset($this->routes['get'])) $this->routes['get'] = array();
-                    if (!isset($this->routes['post'])) $this->routes['post'] = array();
-
-                    array_push($this->routes['get'], $route);
-                    array_push($this->routes['post'], $route);
-                } else {
-                    // Handle a single method type or an array of types.
-                    if (is_array($type)) {
-                        foreach ($type as $t) {
-                            if (!isset($this->routes[$t])) $this->routes[$t] = array();
-                            array_push($this->routes[$t], $route);
-                        }
-                    } else {
-                        if (!isset($this->routes[$type])) $this->routes[$type] = array();
-                        array_push($this->routes[$type], $route);
-                    }
+                // Add a route for each request type
+                foreach ($request_types as $request_type) {
+                    if (!isset($this->routes[$request_type])) $this->routes[$request_type] = array();
+                    array_push($this->routes[$request_type], $route);
                 }
             }
         }
