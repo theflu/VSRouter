@@ -9,6 +9,8 @@ class Router
      */
     private $routes = array();
 
+    private const REQUEST_METHODS = array("GET","POST","PUT","DELETE");
+
     /**
      * Loads route definitions from a file or a directory.
      *
@@ -43,7 +45,7 @@ class Router
      */
     public function get($uri, $callback, $precheck = null, $fail = null)
     {
-        $this->add('get', $uri, $callback, $precheck, $fail);
+        $this->add(['GET'], $uri, $callback, $precheck, $fail);
     }
 
     /**
@@ -51,7 +53,7 @@ class Router
      */
     public function post($uri, $callback, $precheck = null, $fail = null)
     {
-        $this->add('post', $uri, $callback, $precheck, $fail);
+        $this->add(['POST'], $uri, $callback, $precheck, $fail);
     }
 
     /**
@@ -59,7 +61,7 @@ class Router
      */
     public function postGet($uri, $callback, $precheck = null, $fail = null)
     {
-        $this->add(['post', 'get'], $uri, $callback, $precheck, $fail);
+        $this->add(['POST', 'GET'], $uri, $callback, $precheck, $fail);
     }
 
     /**
@@ -97,7 +99,7 @@ class Router
     public function redirect($uri, $to, $code = 301)
     {
         // Add a route for the redirect
-        $this->add('both', $uri, function () use ($to, $code) {
+        $this->add(['POST', 'GET'], $uri, function () use ($to, $code) {
             header('Location: ' . $to, true, $code);
             exit();
         });
@@ -166,6 +168,10 @@ class Router
 
                 // Add a route for each request type
                 foreach ($request_types as $request_type) {
+                    // Make the request type upper case
+                    $request_type = strtolower($request_type);
+
+                    // Add the route
                     if (!isset($this->routes[$request_type])) $this->routes[$request_type] = array();
                     array_push($this->routes[$request_type], $route);
                 }
@@ -182,7 +188,7 @@ class Router
     public function route($trailing_slash = NULL, $subdir = null)
     {
         // Directly accessing superglobals makes this method harder to test.
-        $http_method = strtolower($_SERVER['REQUEST_METHOD']);
+        $http_method = strtoupper($_SERVER['REQUEST_METHOD']);
         $uri = $_SERVER['REQUEST_URI'];
 
         // Optional trailing slash enforcement.
